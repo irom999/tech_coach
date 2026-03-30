@@ -5,12 +5,17 @@ import { Send, Loader2 } from 'lucide-react'
 import { Message } from '@/types'
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window === 'undefined') return []
+    const saved = sessionStorage.getItem('chat_messages')
+    return saved ? JSON.parse(saved) : []
+  })
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    sessionStorage.setItem('chat_messages', JSON.stringify(messages))
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
