@@ -35,12 +35,14 @@ export async function POST(req: NextRequest) {
     const userMessage = messages[messages.length - 1].content
     const topics = extractTopics(userMessage)
 
-    await getSupabase().from('chat_logs').insert({
+    const { error: dbError } = await getSupabase().from('chat_logs').insert({
       user_message: userMessage,
       assistant_message: assistantMessage,
+      provider: 'openai',
       model,
       topics,
     })
+    if (dbError) console.error('Supabase insert error:', dbError)
 
     return NextResponse.json({ message: assistantMessage })
   } catch (error) {
